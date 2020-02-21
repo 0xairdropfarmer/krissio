@@ -9,13 +9,14 @@ import {
   List,
   Headline,
 } from 'react-native-paper';
-import HTMLRender from 'react-native-htmlview';
-import moment from 'moment';
-const Home = () => {
+import ContentPlaceholder from '../components/ContentPlaceholder';
+import PostCard from '../components/PostCard';
+const Home = ({navigation}) => {
   const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [page, setPage] = useState(1);
+
   useEffect(() => {
     fetchLastestPost();
   }, []);
@@ -39,7 +40,7 @@ const Home = () => {
     } else {
       setPosts([...posts, ...post]);
     }
-
+    setIsLoading(false);
     setIsFetching(false);
   };
   function onRefresh() {
@@ -61,41 +62,27 @@ const Home = () => {
       </View>
     );
   }
-  return (
-    <View>
-      <Headline style={{marginLeft: 30}}>Lastest Post</Headline>
-      <FlatList
-        data={posts}
-        onRefresh={() => onRefresh()}
-        refreshing={isFetching}
-        onEndReached={() => handleLoadMore()}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={() => renderFooter()}
-        renderItem={({item}) => (
-          <Card
-            style={{
-              shadowOffset: {width: 5, height: 5},
-              width: '90%',
-              borderRadius: 12,
-              alignSelf: 'center',
-              marginBottom: 10,
-            }}>
-            <Card.Content>
-              <Title>{item.title.rendered}</Title>
-              <Paragraph>Published on {moment(item.date).fromNow()}</Paragraph>
-            </Card.Content>
-            <Card.Cover source={{uri: item.jetpack_featured_media_url}} />
-            <Card.Content>
-              <Card.Content>
-                <HTMLRender value={item.excerpt.rendered} />
-              </Card.Content>
-            </Card.Content>
-          </Card>
-        )}
-        keyExtractor={item => item.id}
-      />
-    </View>
-  );
+  if (isLoading) {
+    return <ContentPlaceholder />;
+  } else {
+    return (
+      <View>
+        <Headline style={{marginLeft: 30}}>Lastest Post</Headline>
+        <FlatList
+          data={posts}
+          onRefresh={() => onRefresh()}
+          refreshing={isFetching}
+          onEndReached={() => handleLoadMore()}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={() => renderFooter()}
+          renderItem={({item}) => (
+            <PostCard item={item} navigation={navigation} />
+          )}
+          keyExtractor={item => item.id}
+        />
+      </View>
+    );
+  }
 };
 
 export default Home;

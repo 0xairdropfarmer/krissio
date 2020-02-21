@@ -18,6 +18,7 @@ import {
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme
 } from "react-native-paper";
+import  MaterialCommunityIcons  from 'react-native-vector-icons/MaterialCommunityIcons';
 const Stack = createStackNavigator();
 function HomeStack() {
   return (
@@ -63,7 +64,28 @@ export default function DashboardTabNavigator() {
   return (
     <PaperProvider >
       <NavigationContainer >
-        <Tab.Navigator>
+      <Tab.Navigator screenOptions={({ route }) => ({
+                    tabBarIcon: ({ focused, color, size }) => {
+                        let iconName;
+
+                        if (route.name === 'Home') {
+                            iconName = focused ? 'home' : 'home-outline';
+                        } else if (route.name === 'Bookmark') {
+                            iconName = focused ? 'bookmark' : 'bookmark-outline';
+                        } else if (route.name === 'Categories') {
+                            iconName = focused ? 'apps' : 'apps-box';
+                        } else if (route.name === 'Settings') {
+                            iconName = focused ? 'settings' : 'settings-box';
+                        }
+
+                        // You can return any component that you like here!
+                        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+                    },
+                })}
+                    tabBarOptions={{
+                        activeTintColor: 'tomato',
+                        inactiveTintColor: 'gray',
+                    }}>
           <Tab.Screen name="Home" component={HomeStack} />
           <Tab.Screen name="Categories" component={CategorieStack} />
           <Tab.Screen name="Bookmark" component={BookMarkStack} />

@@ -17,6 +17,7 @@ const PostCard = ({item, navigation}) => {
       onPress={() =>
         navigation.navigate('SinglePost', {
           post_id: item.id,
+          name: item.title.rendered,
         })
       }>
       <Card

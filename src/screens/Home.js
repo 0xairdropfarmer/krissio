@@ -63,7 +63,11 @@ const Home = ({navigation}) => {
     );
   }
   if (isLoading) {
-    return <ContentPlaceholder />;
+    return (
+      <View style={{marginTop: 30, padding: 12}}>
+        <ContentPlaceholder />
+      </View>
+    );
   } else {
     return (
       <View>
@@ -78,7 +82,7 @@ const Home = ({navigation}) => {
           renderItem={({item}) => (
             <PostCard item={item} navigation={navigation} />
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index.toString()}
         />
       </View>
     );

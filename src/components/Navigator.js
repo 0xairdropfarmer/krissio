@@ -24,7 +24,11 @@ function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="SinglePost" component={SinglePost} />
+      <Stack.Screen
+        name="SinglePost"
+        component={SinglePost}
+        options={({route}) => ({title: 'Post'})}
+      />
     </Stack.Navigator>
   );
 }
@@ -44,11 +48,16 @@ function SettingStack() {
     </Stack.Navigator>
   );
 }
-function CategorieStack() {
+function CategorieStack({navigation}) {
+  console.log(navigation);
   return (
     <Stack.Navigator>
       <Stack.Screen name="Categorie" component={CategorieScreen} />
-      <Stack.Screen name="CategorieList" component={CategorieList} />
+      <Stack.Screen
+        name="CategorieList"
+        component={CategorieList}
+        options={({route}) => ({title: route.params.categorie_name})}
+      />
       <Stack.Screen name="SinglePost" component={SinglePost} />
     </Stack.Navigator>
   );

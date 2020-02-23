@@ -31,6 +31,7 @@ const Contact = () => {
                                     color="white"
                                 />
                             }
+
                             ref={input}
                             placeholder='Your name'
                             errorStyle={{ color: 'red' }}

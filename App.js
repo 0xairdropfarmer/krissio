@@ -24,8 +24,12 @@ if (window.__FETCH_SUPPORT__) {
     : global.FileReader;
 }
 console.disableYellowBox = true;
+import { ThemeController } from './src/components/ThemeController'
+
 export default function App() {
   return (
+    <ThemeController>
       <Navigators />
+    </ThemeController>
   );
 }

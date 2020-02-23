@@ -1,17 +1,12 @@
-import React, {useState, useEffect} from 'react';
-import {FlatList, View, ActivityIndicator} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, View, ActivityIndicator } from 'react-native';
 import {
-  Avatar,
-  Button,
-  Card,
-  Title,
-  Paragraph,
-  List,
+  withTheme,
   Headline,
 } from 'react-native-paper';
 import ContentPlaceholder from '../components/ContentPlaceholder';
 import PostCard from '../components/PostCard';
-const Home = ({navigation}) => {
+const Home = ({ navigation, props }) => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
@@ -62,16 +57,17 @@ const Home = ({navigation}) => {
       </View>
     );
   }
+  console.log(props)
   if (isLoading) {
     return (
-      <View style={{marginTop: 30, padding: 12}}>
+      <View style={{ marginTop: 30, padding: 12 }}>
         <ContentPlaceholder />
       </View>
     );
   } else {
     return (
       <View>
-        <Headline style={{marginLeft: 30}}>Lastest Post</Headline>
+        <Headline style={{ marginLeft: 30 }}>Lastest Post</Headline>
         <FlatList
           data={posts}
           onRefresh={() => onRefresh()}
@@ -79,8 +75,8 @@ const Home = ({navigation}) => {
           onEndReached={() => handleLoadMore()}
           onEndReachedThreshold={0.1}
           ListFooterComponent={() => renderFooter()}
-          renderItem={({item}) => (
-            <PostCard item={item} navigation={navigation} />
+          renderItem={({ item }) => (
+            <PostCard item={item} navigation={navigation} colors={colors} />
           )}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -89,4 +85,4 @@ const Home = ({navigation}) => {
   }
 };
 
-export default Home;
+export default withTheme(Home);

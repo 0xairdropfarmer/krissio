@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
   DarkTheme,
 } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/Home';
 import CategorieScreen from '../screens/Categories';
 import SettingScreen from '../screens/Setting';
@@ -19,16 +19,41 @@ import {
   DarkTheme as PaperDarkTheme,
 } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ThemeContext } from '../components/ThemeController'
+import {ThemeContext} from '../components/ThemeController';
+import {useNetInfo} from '@react-native-community/netinfo';
+
+import {Text, View} from 'react-native';
 const Stack = createStackNavigator();
+
 function HomeStack() {
+  const netInfo = useNetInfo();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={({route}) => ({
+          headerRight: () =>
+            netInfo.isConnected ? (
+              <Text />
+            ) : (
+              <View style={{flexDirection: 'row', marginRight: 12}}>
+                <MaterialCommunityIcons
+                  name={'wifi-off'}
+                  size={22}
+                  color={'black'}
+                />
+                <Text>Your are offline</Text>
+              </View>
+            ),
+        })}
+      />
       <Stack.Screen
         name="SinglePost"
         component={SinglePost}
-        options={({ route }) => ({ title: 'Post' })}
+        options={({route}) => ({
+          title: <Text>Is Connected? {netInfo.isConnected.toString()}</Text>,
+        })}
       />
     </Stack.Navigator>
   );
@@ -49,15 +74,14 @@ function SettingStack() {
     </Stack.Navigator>
   );
 }
-function CategorieStack({ navigation }) {
-  console.log(navigation);
+function CategorieStack({navigation}) {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Categorie" component={CategorieScreen} />
       <Stack.Screen
         name="CategorieList"
         component={CategorieList}
-        options={({ route }) => ({ title: route.params.categorie_name })}
+        options={({route}) => ({title: route.params.categorie_name})}
       />
       <Stack.Screen name="SinglePost" component={SinglePost} />
     </Stack.Navigator>
@@ -67,7 +91,7 @@ function CategorieStack({ navigation }) {
 const Tab = createBottomTabNavigator();
 
 export default function DashboardTabNavigator() {
-  const { theme } = useContext(ThemeContext);
+  const {theme} = useContext(ThemeContext);
   let paper_theme = theme ? PaperDarkTheme : PaperDefaultTheme;
   let nav_theme = theme ? DarkTheme : DefaultTheme;
 
@@ -75,8 +99,8 @@ export default function DashboardTabNavigator() {
     <PaperProvider theme={paper_theme}>
       <NavigationContainer theme={nav_theme}>
         <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => {
+          screenOptions={({route}) => ({
+            tabBarIcon: ({focused, color, size}) => {
               let iconName;
 
               if (route.name === 'Home') {

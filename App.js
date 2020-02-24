@@ -1,6 +1,5 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Navigators from "./src/components/Navigator";
+import React from 'react';
+import Navigators from './src/components/Navigator';
 global.XMLHttpRequest = global.originalXMLHttpRequest
   ? global.originalXMLHttpRequest
   : global.XMLHttpRequest;
@@ -24,8 +23,7 @@ if (window.__FETCH_SUPPORT__) {
     : global.FileReader;
 }
 console.disableYellowBox = true;
-import { ThemeController } from './src/components/ThemeController'
-
+import {ThemeController} from './src/components/ThemeController';
 export default function App() {
   return (
     <ThemeController>

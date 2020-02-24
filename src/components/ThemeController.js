@@ -1,26 +1,25 @@
-import React, { createContext, useState } from 'react';
-
+import React, {createContext, useState} from 'react';
+import {eventEmitter} from 'react-native-dark-mode';
 export const ThemeContext = createContext();
-import { eventEmitter } from 'react-native-dark-mode';
-export const ThemeController = ({ children }) => {
-    const [theme, setTheme] = useState(false);
-    eventEmitter.on('currentModeChanged', newMode => {
-        if (newMode == 'dark') {
-            setTheme(true);
-        } else {
-            setTheme(false);
-        }
-    });
-    const toggleTheme = value => {
-        if (value === true) {
-            setTheme(true);
-        } else {
-            setTheme(false);
-        }
-    };
-    return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+export const ThemeController = ({children}) => {
+  const [theme, setTheme] = useState(false);
+  eventEmitter.on('currentModeChanged', newMode => {
+    if (newMode == 'dark') {
+      setTheme(true);
+    } else {
+      setTheme(false);
+    }
+  });
+  const toggleTheme = value => {
+    if (value === true) {
+      setTheme(true);
+    } else {
+      setTheme(false);
+    }
+  };
+  return (
+    <ThemeContext.Provider value={{theme, toggleTheme}}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };

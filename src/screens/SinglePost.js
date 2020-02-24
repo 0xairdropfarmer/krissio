@@ -1,12 +1,28 @@
 import React, {useState, useEffect} from 'react';
-import {Avatar, Button, Card, Title, Paragraph, List} from 'react-native-paper';
-import HTML from 'react-native-htmlview';
-import {Share, ScrollView, TouchableOpacity, View} from 'react-native';
+import {
+  Avatar,
+  withTheme,
+  Card,
+  Title,
+  Paragraph,
+  List,
+} from 'react-native-paper';
+import HTML from 'react-native-render-html';
+import {
+  Share,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 import ContentPlaceholder from '../components/ContentPlaceholder';
 import moment from 'moment';
 import AsyncStorage from '@react-native-community/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useRoute} from '@react-navigation/native';
+import {useNetInfo} from '@react-native-community/netinfo';
+const cacheKey = 'HomeCache';
+
 const fetchPost = async url => {
   const response = await fetch(url);
   return response.json();
@@ -18,11 +34,12 @@ const onShare = async (title, uri) => {
   });
 };
 
-const SinglePost = () => {
+const SinglePost = ({theme}) => {
   const [isLoading, setisLoading] = useState(true);
   const [post, setpost] = useState([]);
   const [bookmark, setbookmark] = useState(false);
   const route = useRoute();
+  const netInfo = useNetInfo();
   const saveBookMark = async post_id => {
     setbookmark(true);
     await AsyncStorage.getItem('bookmark').then(token => {
@@ -60,15 +77,29 @@ const SinglePost = () => {
       }
     });
   };
-  useEffect(() => {
+  useEffect(async () => {
     let post_id = route.params.post_id;
     renderBookMark(post_id);
-    fetchPost(
-      `https://kriss.io/wp-json/wp/v2/posts?_embed&include=${post_id}`,
-    ).then(post => {
+
+    let status = netInfo.isConnected;
+    if (!status) {
+      const _cachedData = await AsyncStorage.getItem(cacheKey);
+      if (!_cachedData) {
+        alert("You're currently offline and no local data was found.");
+      }
+      const cachedData = JSON.parse(_cachedData);
+
+      let post = cachedData.post.filter(value => value.id === post_id);
       setpost(post);
       setisLoading(false);
-    });
+    } else {
+      fetchPost(
+        `https://kriss.io/wp-json/wp/v2/posts?_embed&include=${post_id}`,
+      ).then(post => {
+        setpost(post);
+        setisLoading(false);
+      });
+    }
   }, []);
 
   if (isLoading) {
@@ -78,7 +109,6 @@ const SinglePost = () => {
       </View>
     );
   } else {
-    console.log(post);
     return (
       <ScrollView>
         <Card>
@@ -137,7 +167,16 @@ const SinglePost = () => {
           </Card.Content>
           <Card.Cover source={{uri: post[0].jetpack_featured_media_url}} />
           <Card.Content>
-            <HTML value={post[0].content.rendered} />
+            <HTML
+              html={post[0].content.rendered}
+              imagesMaxWidth={Dimensions.get('window').width}
+              tagsStyles={{
+                p: {color: theme.colors.text},
+                pre: {color: theme.colors.accent},
+                h1: {color: theme.colors.text},
+                h2: {color: theme.colors.text},
+              }}
+            />
           </Card.Content>
         </Card>
       </ScrollView>
@@ -145,4 +184,4 @@ const SinglePost = () => {
   }
 };
 
-export default SinglePost;
+export default withTheme(SinglePost);

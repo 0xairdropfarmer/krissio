@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import HTMLRender from 'react-native-htmlview';
+import React, {useEffect} from 'react';
+import {TouchableOpacity} from 'react-native';
+import HTMLRender from 'react-native-render-html';
 import moment from 'moment';
 import {
   Avatar,
@@ -11,8 +11,7 @@ import {
   withTheme,
   Headline,
 } from 'react-native-paper';
-const PostCard = ({ item, navigation, colors }) => {
-
+const PostCard = ({item, navigation, theme}) => {
   return (
     <TouchableOpacity
       onPress={() =>
@@ -23,7 +22,7 @@ const PostCard = ({ item, navigation, colors }) => {
       }>
       <Card
         style={{
-          shadowOffset: { width: 5, height: 5 },
+          shadowOffset: {width: 5, height: 5},
           width: '90%',
           borderRadius: 12,
           alignSelf: 'center',
@@ -33,12 +32,15 @@ const PostCard = ({ item, navigation, colors }) => {
           <Title>{item.title.rendered}</Title>
           <Paragraph>Published on {moment(item.date).fromNow()}</Paragraph>
         </Card.Content>
-        <Card.Cover source={{ uri: item.jetpack_featured_media_url }} />
+        <Card.Cover source={{uri: item.jetpack_featured_media_url}} />
         <Card.Content>
           <Card.Content>
-            <HTMLRender value={item.excerpt.rendered} stylesheet={{
-              p: { color: colors.text }
-            }} />
+            <HTMLRender
+              html={item.excerpt.rendered}
+              tagsStyles={{
+                p: {color: theme.colors.text},
+              }}
+            />
           </Card.Content>
         </Card.Content>
       </Card>

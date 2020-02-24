@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { FlatList, View, ActivityIndicator } from 'react-native';
-import {
-  withTheme,
-  Headline,
-} from 'react-native-paper';
+import React, {useState, useEffect} from 'react';
+import {FlatList, View, ActivityIndicator} from 'react-native';
+import {withTheme, Headline} from 'react-native-paper';
 import ContentPlaceholder from '../components/ContentPlaceholder';
 import PostCard from '../components/PostCard';
-const Home = ({ navigation, props }) => {
+import {useNetInfo} from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-community/async-storage';
+const cacheKey = 'HomeCache';
+const Home = ({navigation}) => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [page, setPage] = useState(1);
-
+  const netInfo = useNetInfo();
   useEffect(() => {
     fetchLastestPost();
   }, []);
@@ -26,17 +26,36 @@ const Home = ({ navigation, props }) => {
     }
   }, [page]);
   fetchLastestPost = async () => {
-    const response = await fetch(
-      `https://kriss.io/wp-json/wp/v2/posts?per_page=5&page=${page}`,
-    );
-    const post = await response.json();
-    if (page == 1) {
-      setPosts(post);
+    let status = netInfo.isConnected;
+    if (!status) {
+      const _cachedData = await AsyncStorage.getItem(cacheKey);
+      if (!_cachedData) {
+        alert("You're currently offline and no local data was found.");
+      }
+      let cachedData = JSON.parse(_cachedData);
+      console.log(cachedData);
+      setPosts(cachedData);
+      setIsLoading(false);
+      setIsFetching(false);
     } else {
-      setPosts([...posts, ...post]);
+      const response = await fetch(
+        `https://kriss.io/wp-json/wp/v2/posts?per_page=5&page=${page}`,
+      );
+      const post = await response.json();
+      if (page == 1) {
+        setPosts(post);
+      } else {
+        setPosts([...posts, ...post]);
+      }
+      setIsLoading(false);
+      setIsFetching(false);
+      await AsyncStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          post,
+        }),
+      );
     }
-    setIsLoading(false);
-    setIsFetching(false);
   };
   function onRefresh() {
     setIsFetching(true);
@@ -57,17 +76,17 @@ const Home = ({ navigation, props }) => {
       </View>
     );
   }
-  console.log(props)
   if (isLoading) {
     return (
-      <View style={{ marginTop: 30, padding: 12 }}>
+      <View style={{marginTop: 30, padding: 12}}>
         <ContentPlaceholder />
       </View>
     );
   } else {
+    console.log(posts);
     return (
       <View>
-        <Headline style={{ marginLeft: 30 }}>Lastest Post</Headline>
+        <Headline style={{marginLeft: 30}}>Lastest Post</Headline>
         <FlatList
           data={posts}
           onRefresh={() => onRefresh()}
@@ -75,8 +94,8 @@ const Home = ({ navigation, props }) => {
           onEndReached={() => handleLoadMore()}
           onEndReachedThreshold={0.1}
           ListFooterComponent={() => renderFooter()}
-          renderItem={({ item }) => (
-            <PostCard item={item} navigation={navigation} colors={colors} />
+          renderItem={({item}) => (
+            <PostCard item={item} navigation={navigation} />
           )}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -85,4 +104,4 @@ const Home = ({ navigation, props }) => {
   }
 };
 
-export default withTheme(Home);
+export default Home;
